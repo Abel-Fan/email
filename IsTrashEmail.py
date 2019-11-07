@@ -14,7 +14,7 @@ with open("data/normal/33","r",encoding="gbk",errors="ignore") as f:
 
 
 def GetRatio(con):
-    index = con.index("\n\n")
+    index = con.find("\n\n") if con.find("\n\n")>0 else 0
     con = con[index:]
     con = con.replace("\n", "").strip()
     r = re.compile('[^\u4E00-\u9FA5]+')
@@ -25,22 +25,24 @@ def GetRatio(con):
     p = 1
     rest_p = 1
     for word in words:
-        p *= ratio[word][1]  # word词 是垃圾邮件的概率
-        rest_p *= 1-ratio[word][1]
+        if word in ratio:
+            p *= ratio[word][1]  # word词 是垃圾邮件的概率
+            rest_p *= 1-ratio[word][1]
 
     P = p/(p+rest_p)
 
     p1 = 1
     rest_p1 = 1
     for word in words:
-        p1 *= ratio[word][0]  # word词 是正常邮件的概率
-        rest_p1 *= 1-ratio[word][0]
+        if word in ratio:
+            p1 *= ratio[word][0]  # word词 是正常邮件的概率
+            rest_p1 *= 1-ratio[word][0]
 
     P1 = p1/(p1+rest_p1)
     print(P)
     if P>P1:
-        print("垃圾邮件")
+        return False
     else:
-        print("正常邮件")
+        return True
 
 GetRatio(email)
